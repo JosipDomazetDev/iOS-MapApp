@@ -4,7 +4,7 @@ import CoreLocation
 import CoreLocationUI
 import UserNotifications
 
-struct City: Identifiable {
+struct CurrentLocationWrapper: Identifiable {
     let id = UUID()
     let name: String
     let coordinate: CLLocationCoordinate2D
@@ -13,15 +13,13 @@ struct City: Identifiable {
 struct ContentView: View {
     @State private var region = MKCoordinateRegion(
         center: CLLocationCoordinate2D(latitude: 36.778259, longitude: -119.417931),
-        span: MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+        span: MKCoordinateSpan(latitudeDelta: 10, longitudeDelta: 0.1)
     )
     @State private var currentLocation = CLLocationCoordinate2D(latitude: 36.778259, longitude: -119.417931)
     
-    var annotations: [City] {
-        [City(name: "Current Location", coordinate: currentLocation)]
+    var annotations: [CurrentLocationWrapper] {
+        [CurrentLocationWrapper(name: "Current Location", coordinate: currentLocation)]
     }
-    
-    
     
     var body: some View {
         ZStack {
@@ -44,7 +42,7 @@ struct ContentView: View {
                 
                 HStack {
                     LocationButton(.currentLocation) {
-                        
+                        setupLocation()
                     }
                     .buttonStyle(.bordered)
                     .foregroundColor(.white)
@@ -64,19 +62,15 @@ struct ContentView: View {
                 }.padding(.bottom, 28)
             }
         }
-        .onAppear(perform: setupLocation)
     }
     
     func setupLocation() {
-        print("frgrgrgrgr")
         let manager = CLLocationManager()
         manager.requestWhenInUseAuthorization()
         if let location = manager.location {
             currentLocation = location.coordinate
         }
     }
-    
-    
     
     
     func sendNotification() {
